@@ -1,17 +1,21 @@
 import { CorsOptions } from 'cors'
 
-export const corsConfig : CorsOptions = {
-    origin: function(origin, callback) {
-        const whiteList = [process.env.FRONTEND_URL]
+export const corsConfig: CorsOptions = {
+  origin: function (origin, callback) {
+    // Lista blanca con el frontend definido en env
+    const whiteList = [process.env.FRONTEND_URL]
 
-        if(process.argv[2] === '--api') {
-            whiteList.push(undefined)
-        }
-
-        if(whiteList.includes(origin)) {
-            callback(null, true)
-        } else {
-            callback(new Error('Error de CORS'))
-        }
+    // Permitir llamadas sin 'origin' (como Postman) solo en desarrollo
+    if (process.env.NODE_ENV !== 'production') {
+      whiteList.push(undefined)
+      whiteList.push('http://localhost:3000') // si usas localhost frontend
     }
+
+    if (whiteList.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Error de CORS'))
+    }
+  },
+  credentials: true, // si usas cookies o autenticación con credenciales
 }
